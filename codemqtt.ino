@@ -9,17 +9,21 @@
 #define WIFI_STA_NAME "ANGKHANA" //change to your own ssid
 #define WIFI_STA_PASS "61032522" //change to your own password
 
-#define MQTT_SERVER "m16.cloudmqtt.com"
-#define MQTT_PORT 16319
-#define MQTT_USER_ID "GESTURE01"
-#define MQTT_USERNAME "ggaomyqh"
-#define MQTT_PASSWORD "3wjA27NFU3ET"
+#define MQTT_SERVER "driver.cloudmqtt.com"
+#define MQTT_PORT   18869
+#define MQTT_USER_ID "tikproject"
+#define MQTT_USERNAME "dothhsps"
+#define MQTT_PASSWORD "TLjB0NeLDOrt"
 
 #define RXD2 16
 #define TXD2 17
 
 char output[1024];
 static const uint32_t GPSBaud = 9600;
+double LAT;
+double LONG;
+String latitude;
+String longitude;
 
 WiFiClient client;
 PubSubClient mqtt(client);
@@ -28,7 +32,7 @@ HardwareSerial ss(2);
 
 void setup()
 {
-    Serial.begin(19200);
+    Serial.begin(9600);
     ss.begin(GPSBaud, SERIAL_8N1, RXD2, TXD2, false);
     Serial.println(TinyGPSPlus::libraryVersion());
     pinMode(LED_BUILTIN, OUTPUT);
@@ -98,28 +102,32 @@ void sendDataToServer()
     doc["type"] = "ferry";
     doc["ship_id"] = "tik"; //add docID same with firebase per each ship
     doc["lat"] = latitude;
-    doc["lng"] = longitude,;
+    doc["lng"] = longitude;
 
     delay(100);
 
     serializeJson(doc, output);
 
-    delay(100);
+    delay(1000);
 
     mqtt.publish("/locations", output);
 }
+
 
 void displayInfo()
 {
     Serial.print(F("Location: "));
     if (gps.location.isValid())
     {
-      double latitude = (gps.location.lat(), 6);
-      double longitude = (gps.location.lng(), 6);
+   LAT = gps.location.lat(),6;
+   LONG = gps.location.lng(),6;
 
-      Serial.print(gps.location.lat(), 6);
+   latitude = String(LAT);
+   longitude = String(LONG);
+
+      Serial.print(gps.location.lat(),6);
       Serial.print(F(","));
-      Serial.print(gps.location.lng(), 6);
+      Serial.print(gps.location.lng(),6);
     }
    else
     {
